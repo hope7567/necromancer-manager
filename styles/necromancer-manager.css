@@ -1,0 +1,212 @@
+/* Necromancer Manager
+ * Le style principal de l'interface est conservé dans le contenu du Dialog
+ * afin de reprendre la macro fournie sans altération visuelle.
+ */
+.control-tool[data-tool="necromancer-manager"] i,
+.scene-control[data-tool="necromancer-manager"] i {
+  pointer-events: none;
+}
+
+/* Fenêtre de création de groupe alignée sur l'interface principale. */
+.nm-create-group-dialog .window-content {
+  padding: 14px;
+  background: #17191d;
+  color: #e7e7e7;
+}
+
+.nm-create-group-dialog .nm-create-group-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nm-create-group-dialog .form-group {
+  display: grid;
+  grid-template-columns: 145px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.nm-create-group-dialog label {
+  font-weight: 600;
+  color: #f0f0f0;
+}
+
+.nm-create-group-dialog input,
+.nm-create-group-dialog select {
+  width: 100%;
+  min-height: 30px;
+  border: 1px solid #555b66;
+  border-radius: 4px;
+  background: #f6f6f6;
+  color: #111;
+}
+
+.nm-create-group-dialog .dialog-buttons {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.nm-create-group-dialog .dialog-button {
+  min-height: 32px;
+  border: 1px solid #666d78;
+  border-radius: 4px;
+}
+
+
+/* Boutons des fenêtres secondaires, alignés sur l'interface principale. */
+.nm-create-group-dialog .dialog-button,
+.nm-create-group-dialog button {
+  background: #ffffff !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  border: 1px solid #8b8f96 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  font-weight: 700;
+}
+
+.nm-create-group-dialog .dialog-button:hover:not(:disabled),
+.nm-create-group-dialog button:hover:not(:disabled) {
+  background: #e8e8e8 !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  border-color: #444950 !important;
+}
+
+/* Les onglets actifs restent lisibles avec le thème blanc des boutons. */
+.necromancer-manager-root .nm-main-tab.is-active,
+.necromancer-manager-root .nm-main-tab.is-active *,
+.necromancer-manager-root .hm-tab-shell.is-active,
+.necromancer-manager-root .hm-tab-shell.is-active *,
+.necromancer-manager-root .hm-section-tab.is-active,
+.necromancer-manager-root .hm-section-tab.is-active *,
+.necromancer-manager-root .hm-tab.is-active,
+.necromancer-manager-root .hm-tab.is-active * {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+
+/* Groupe actif : texte toujours noir sur fond blanc */
+.necromancer-manager-root input,
+.necromancer-manager-root .selected-group,
+.necromancer-manager-root .active-group,
+.necromancer-manager-root .group-name,
+.necromancer-manager-root .group-title,
+.necromancer-manager-root .group-selector,
+.necromancer-manager-root .group-selector * {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: none !important;
+}
+
+
+/* Force texte noir dans les champs groupe */
+.necromancer-manager-root input[type="text"],
+.necromancer-manager-root input[type="search"],
+.necromancer-manager-root input[type="text"]::placeholder,
+.necromancer-manager-root input[type="search"]::placeholder{
+ color:#000 !important;
+ -webkit-text-fill-color:#000 !important;
+ opacity:1 !important;
+ caret-color:#000 !important;
+}
+
+/* Composant partagé des listes, utilisé dans l’application et ses dialogues. */
+.necromancer-manager-root .nm-select,
+.nm-create-group-dialog .nm-select,
+.necromancer-manager-root .nm-select:hover,
+.necromancer-manager-root .nm-select:focus,
+.necromancer-manager-root .nm-select:active,
+.nm-create-group-dialog .nm-select:hover,
+.nm-create-group-dialog .nm-select:focus,
+.nm-create-group-dialog .nm-select:active {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  color-scheme: dark !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: #2b2f36 !important;
+  border: 1px solid #555b66 !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
+  padding-right: 30px !important;
+  background-image: linear-gradient(45deg, transparent 50%, #ffffff 50%), linear-gradient(135deg, #ffffff 50%, transparent 50%) !important;
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50% !important;
+  background-size: 5px 5px, 5px 5px !important;
+  background-repeat: no-repeat !important;
+}
+
+.necromancer-manager-root .nm-select option,
+.necromancer-manager-root .nm-select optgroup,
+.nm-create-group-dialog .nm-select option,
+.nm-create-group-dialog .nm-select optgroup {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: #1f1f1f !important;
+  text-shadow: none !important;
+}
+
+.necromancer-manager-root .nm-select option:checked,
+.nm-create-group-dialog .nm-select option:checked {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: #276fd1 !important;
+}
+
+
+/* Composant factorisé final : toutes les listes utilisent nm-select. */
+html body .necromancer-manager-root select.nm-select,
+html body .necromancer-manager-root select.nm-select:hover,
+html body .necromancer-manager-root select.nm-select:focus,
+html body .necromancer-manager-root select.nm-select:active,
+html body .nm-create-group-dialog select.nm-select {
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  color-scheme:dark !important;
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background-color:#2b2f36 !important;
+  border:1px solid #555b66 !important;
+  border-radius:12px !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  font-weight:700 !important;
+  padding-right:30px !important;
+  background-image:linear-gradient(45deg, transparent 50%, #ffffff 50%), linear-gradient(135deg, #ffffff 50%, transparent 50%) !important;
+  background-position:calc(100% - 15px) 50%, calc(100% - 10px) 50% !important;
+  background-size:5px 5px, 5px 5px !important;
+  background-repeat:no-repeat !important;
+}
+html body .necromancer-manager-root select.nm-select option,
+html body .necromancer-manager-root select.nm-select optgroup,
+html body .nm-create-group-dialog select.nm-select option,
+html body .nm-create-group-dialog select.nm-select optgroup {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+  background:#1f1f1f !important;
+}
+
+
+/* Radio buttons */
+.necromancer-manager-root input[type="radio"]{
+  accent-color:#000000 !important;
+}
+.necromancer-manager-root input[type="radio"]:checked{
+  accent-color:#000000 !important;
+}
+.necromancer-manager-root input[type="radio"]:checked + label,
+.necromancer-manager-root label:has(input[type="radio"]:checked){
+  font-weight:700 !important;
+}
+
+/* Formule de dégâts Custom */
+.necromancer-manager-root input.nm-custom-damage-formula {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff !important;
+}
