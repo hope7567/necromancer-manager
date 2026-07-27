@@ -117,38 +117,37 @@ async function gmAddMember(groupActor, memberActor) {
 }
 
 
-function tokenScalingSettings() {
-  const step = Math.max(0, Number(game.settings.get(MODULE_ID, "tokenScaleIncrement")) || 0);
-  const creaturesPerStep = Math.max(1, Math.trunc(Number(game.settings.get(MODULE_ID, "tokenScaleEvery")) || 1));
-  return { step, creaturesPerStep };
-}
-
-function groupTokenSizing(count, baseWidth = 1, baseHeight = 1, baseScaleX = 1, baseScaleY = 1) {
+function groupTokenSizing(count) {
   const quantity = Math.max(0, Math.trunc(Number(count) || 0));
-  const { step, creaturesPerStep } = tokenScalingSettings();
-  // La première créature conserve strictement les dimensions et l’échelle
-  // d’origine. Les paliers ne s’appliquent qu’aux créatures actives
-  // supplémentaires.
-  const additionalCreatures = Math.max(0, quantity - 1);
-  const completedSteps = Math.floor(additionalCreatures / creaturesPerStep);
-  const increment = completedSteps * step;
-  const round3 = value => Math.round(Number(value) * 1000) / 1000;
-  const gridDimension = value => Math.max(0.5, Math.ceil((Number(value) - 1e-8) * 2) / 2);
 
-  const desiredWidth = Math.max(0.1, Number(baseWidth) || 1) + increment;
-  const desiredHeight = Math.max(0.1, Number(baseHeight) || 1) + increment;
-  const width = gridDimension(desiredWidth);
-  const height = gridDimension(desiredHeight);
+  // Les dimensions déterminent l'emprise réelle du groupe sur la grille.
+  // Le scale fait grossir progressivement l'image dans chaque palier.
+  let dimension = 1;
+  let scale = 1;
 
-  // Foundry V12 n'accepte correctement que les dimensions entières ou par demi-case.
-  // La correction d'échelle du sujet conserve malgré tout une progression visuelle fine.
+  if (quantity >= 15) {
+    dimension = 2.5;
+    scale = 1 + (Math.min(quantity, 20) - 15) * 0.1;
+  } else if (quantity >= 10) {
+    dimension = 2;
+    scale = 1 + (quantity - 10) * 0.1;
+  } else if (quantity >= 5) {
+    dimension = 1.5;
+    scale = 1 + (quantity - 5) * 0.1;
+  } else if (quantity >= 1) {
+    dimension = 1;
+    scale = 1 + (quantity - 1) * 0.1;
+  }
+
+  scale = Number(scale.toFixed(2));
+
   return {
-    width,
-    height,
-    desiredWidth: round3(desiredWidth),
-    desiredHeight: round3(desiredHeight),
-    scaleX: round3((Number(baseScaleX) || 1) * desiredWidth / width),
-    scaleY: round3((Number(baseScaleY) || 1) * desiredHeight / height)
+    width: dimension,
+    height: dimension,
+    desiredWidth: dimension,
+    desiredHeight: dimension,
+    scaleX: scale,
+    scaleY: scale
   };
 }
 
@@ -267,19 +266,13 @@ async function gmCreateOrUpdateGroupToken(ownerUser, group, settings, quantityOv
   let created = false;
   const recordedSourceId = tokenActor?.getFlag(MODULE_ID, "sourceActorId");
   const sourceActor = game.actors.get(recordedSourceId) ?? members[0];
-  const baseWidth = Number(tokenActor?.getFlag(MODULE_ID, "baseTokenWidth"))
-    || Number(sourceActor?.prototypeToken?.width)
-    || 1;
-  const baseHeight = Number(tokenActor?.getFlag(MODULE_ID, "baseTokenHeight"))
-    || Number(sourceActor?.prototypeToken?.height)
-    || 1;
-  const baseScaleX = Number(tokenActor?.getFlag(MODULE_ID, "baseTokenScaleX"))
-    || Number(sourceActor?.prototypeToken?.texture?.scaleX)
-    || 1;
-  const baseScaleY = Number(tokenActor?.getFlag(MODULE_ID, "baseTokenScaleY"))
-    || Number(sourceActor?.prototypeToken?.texture?.scaleY)
-    || 1;
-  const sizing = groupTokenSizing(quantity, baseWidth, baseHeight, baseScaleX, baseScaleY);
+  // La référence visuelle est toujours un token de 1 × 1 case, quelle que
+  // soit la taille du token source copié lors de la création du groupe.
+  const baseWidth = 1;
+  const baseHeight = 1;
+  const baseScaleX = 1;
+  const baseScaleY = 1;
+  const sizing = groupTokenSizing(quantity);
 
   if (!tokenActor) {
     const actorData = sourceActor.toObject();
@@ -300,7 +293,7 @@ async function gmCreateOrUpdateGroupToken(ownerUser, group, settings, quantityOv
         baseTokenHeight: baseHeight,
         baseTokenScaleX: baseScaleX,
         baseTokenScaleY: baseScaleY,
-        tokenSizingMode: "grid-and-subject-scale-v2"
+        tokenSizingMode: "fixed-grid-progressive-scale-v4"
       }
     }, { inplace: false });
     actorData.prototypeToken = foundry.utils.mergeObject(actorData.prototypeToken ?? {}, {
@@ -336,7 +329,7 @@ async function gmCreateOrUpdateGroupToken(ownerUser, group, settings, quantityOv
       [`flags.${MODULE_ID}.baseTokenHeight`]: baseHeight,
       [`flags.${MODULE_ID}.baseTokenScaleX`]: baseScaleX,
       [`flags.${MODULE_ID}.baseTokenScaleY`]: baseScaleY,
-      [`flags.${MODULE_ID}.tokenSizingMode`]: "grid-and-subject-scale-v2"
+      [`flags.${MODULE_ID}.tokenSizingMode`]: "fixed-grid-progressive-scale-v4"
     });
   }
 
@@ -3704,7 +3697,7 @@ export async function openNecromancerManager(requestedUserId = null) {
         </div>
 
         <div class="nm-setup-block nm-help-block">
-          <h4>Fonctionnement de Necromancer Manager</h4>
+          <h4>Fonctionnement de Necromancer Manager v1.0.1</h4>
 
           <h5>Horde</h5>
           <p>Chaque onglet correspond à un groupe. Les créatures sont classées automatiquement selon leur état.</p>
@@ -3742,7 +3735,14 @@ export async function openNecromancerManager(requestedUserId = null) {
           </ul>
 
           <h5>Token de groupe</h5>
-          <p>Le token représente la horde sur la scène. Son nom indique l’effectif actif au survol. Sa taille est recalculée par paliers à partir du nombre de créatures actives ; une seule créature conserve la taille d’origine.</p>
+          <p>Le token représente la horde sur la scène. Son nom indique l'effectif actif au survol.</p>
+          <p>Dans les paramètres du token, la valeur <strong>Dimensions</strong> correspond à l'emprise du token sur la grille (en supposant une grille composée de cases de 5 ft de côté).</p>
+          <p>Les dimensions du token évoluent automatiquement en fonction du nombre de créatures actives :</p>
+          <ul><li>0 à 4 unités actives : <strong>1 × 1</strong></li><li>5 à 9 unités actives : <strong>1,5 × 1,5</strong></li><li>10 à 14 unités actives : <strong>2 × 2</strong></li><li>15 unités actives et plus : <strong>2,5 × 2,5</strong></li></ul>
+          <p>L'incrémentation des dimensions par paliers de <strong>0,5</strong> est une limitation imposée par Foundry VTT.</p>
+          <p>Entre deux paliers, le module augmente uniquement le <strong>Scale</strong> du token par incréments de <strong>0,1</strong>. Cette modification est uniquement visuelle : elle donne une impression de croissance progressive du groupe sans modifier son emprise sur la grille.</p>
+          <p>Le <strong>scaling automatique</strong> peut être désactivé dans les paramètres du module. Lorsqu'il est activé, il est déconseillé de modifier manuellement les <strong>Dimensions</strong> ou le <strong>Scale</strong> du token, car ces valeurs seront automatiquement resynchronisées par Necromancer Manager.</p>
+          <p>Si vous souhaitez contrôler la taille initiale de l'image du token, utilisez Tokenizer avant la synchronisation.</p>
 
           <h5>Utilisateurs et permissions</h5>
           <p>Le MJ sélectionne dans le bandeau l’utilisateur dont il veut administrer la horde. Dans les paramètres du module, il définit le rôle minimal autorisé à accéder au menu Groupes, créer un groupe, ajouter des créatures à un groupe ou supprimer un groupe. Les permissions des actions restent limitées par la permission d’accès au menu Groupes.</p>
@@ -5206,25 +5206,7 @@ Hooks.once("init", () => {
     });
   }
 
-  game.settings.register(MODULE_ID, "tokenScaleIncrement", {
-    name: "Agrandissement par palier",
-    hint: "Valeur ajoutée à la largeur et à la hauteur du token à chaque palier. Une valeur de 0,15 est recommandée.",
-    scope: "world",
-    config: true,
-    type: Number,
-    default: 0.15,
-    onChange: () => scheduleAllGroupTokenSyncs()
-  });
 
-  game.settings.register(MODULE_ID, "tokenScaleEvery", {
-    name: "Créatures par palier",
-    hint: "Nombre de créatures actives nécessaire avant chaque nouvel agrandissement du token.",
-    scope: "world",
-    config: true,
-    type: Number,
-    default: 1,
-    onChange: () => scheduleAllGroupTokenSyncs()
-  });
 
   globalThis.NecromancerManager = {
     open: openNecromancerManager
@@ -5307,6 +5289,28 @@ function scheduleAllGroupTokenSyncs() {
     }
   }, 150);
 }
+
+Hooks.on("updateActor", (actor, changes) => {
+  if (Number(game.user?.role) !== CONST.USER_ROLES.GAMEMASTER) return;
+  if (!actor?.getFlag(MODULE_ID, "groupToken")) return;
+
+  // Tokenizer peut enregistrer son propre scale avec la nouvelle image.
+  // On normalise d'abord cette image à 1, puis la synchronisation du groupe
+  // réapplique le scale calculé selon l'effectif actif.
+  const sourceChanged = foundry.utils.hasProperty(changes, "prototypeToken.texture.src");
+  if (!sourceChanged) return;
+
+  actor.update({
+    "prototypeToken.texture.scaleX": 1,
+    "prototypeToken.texture.scaleY": 1,
+    [`flags.${MODULE_ID}.baseTokenWidth`]: 1,
+    [`flags.${MODULE_ID}.baseTokenHeight`]: 1,
+    [`flags.${MODULE_ID}.baseTokenScaleX`]: 1,
+    [`flags.${MODULE_ID}.baseTokenScaleY`]: 1,
+    [`flags.${MODULE_ID}.tokenSizingMode`]: "fixed-grid-progressive-scale-v4"
+  }).then(() => scheduleAllGroupTokenSyncs())
+    .catch(error => console.warn("Necromancer Manager | Normalisation Tokenizer impossible", error));
+});
 
 Hooks.on("updateActor", actor => scheduleGroupTokenSyncForMember(actor));
 Hooks.on("deleteActor", actor => scheduleGroupTokenSyncForMember(actor));
