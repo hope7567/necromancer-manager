@@ -1,6 +1,6 @@
 # Necromancer Manager
 
-Version 1.0.1 pour Foundry VTT 12 et D&D5e.
+Version 1.0.2 pour Foundry VTT 12 et D&D5e.
 
 - palette native Foundry et adaptation au thème utilisateur ;
 - onglet séparé « Groupes et créatures » ;
@@ -171,3 +171,7 @@ Les trois encadrés de gestion utilisent maintenant le même gabarit :
 - les acteurs créés appartiennent à cet utilisateur ;
 - les dossiers sont organisés sous `NecromancerManager/<Utilisateur>/<Groupe>` ;
 - le MJ dispose d'un sélecteur pour consulter et administrer les listes de chaque utilisateur.
+
+
+## Changelog
+See CHANGELOG.md for version history.

@@ -2,20 +2,17 @@
   "id": "necromancer-manager",
   "title": "Necromancer Manager",
   "description": "Gestionnaire de hordes nécromantiques pour Foundry VTT, avec groupes dynamiques, activités multiples et interface dédiée.",
-  "version": "1.0.1",
-
+  "version": "1.0.2",
   "authors": [
     {
       "name": "Hope"
     }
   ],
-
   "compatibility": {
     "minimum": "12",
-    "verified": "12",
+    "verified": "12.343",
     "maximum": "12"
   },
-
   "relationships": {
     "systems": [
       {
@@ -27,18 +24,14 @@
       }
     ]
   },
-
   "esmodules": [
     "scripts/necromancer-manager.mjs"
   ],
-
   "styles": [
     "styles/necromancer-manager.css"
   ],
-
   "socket": true,
-
   "url": "https://github.com/BoiteAOutilsFoundry/necromancer-manager",
   "manifest": "https://github.com/BoiteAOutilsFoundry/necromancer-manager/releases/latest/download/module.json",
-  "download": "https://github.com/BoiteAOutilsFoundry/necromancer-manager/releases/download/v1.0.1/necromancer-manager.zip"
+  "download": "https://github.com/BoiteAOutilsFoundry/necromancer-manager/releases/download/v1.0.2/necromancer-manager.zip"
 }
