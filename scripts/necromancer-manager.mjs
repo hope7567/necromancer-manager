@@ -1956,7 +1956,7 @@ export async function openNecromancerManager(requestedUserId = null) {
           <div class="hm-card hm-active">
             <div class="hm-head">
               <h3>Squelettes actifs (${titleLabel})</h3>
-              <button type="button" class="btn-toggle-select-all hm-check-btn" data-check-class="sk-check-active">Cocher Actifs</button>
+              <button type="button" class="btn-toggle-select-all hm-check-btn" data-check-class="sk-check-active">Cocher/Décoher actifs</button>
             </div>
 
             <div class="hm-table-wrap-active">
@@ -2029,7 +2029,7 @@ export async function openNecromancerManager(requestedUserId = null) {
 
         <div class="hm-section" data-section="dead">
           <div class="hm-card hm-dead">
-            <div class="hm-head"><h3>Squelettes à 0 PV (${titleLabel})</h3><button type="button" class="btn-toggle-select-all hm-check-btn" data-check-class="sk-check-dead">Cocher 0 PV</button></div>
+            <div class="hm-head"><h3>Squelettes à 0 PV (${titleLabel})</h3><button type="button" class="btn-toggle-select-all hm-check-btn" data-check-class="sk-check-dead">Cocher/Décoher 0 PV</button></div>
             <table class="hm-table" border="1">
               <colgroup><col class="hm-col-check"><col class="hm-col-name"><col class="hm-col-pv"><col class="hm-col-temp"></colgroup>
               <thead><tr><th>✔</th><th>Nom</th><th>PV</th><th>PV temp</th></tr></thead>
@@ -2041,7 +2041,7 @@ export async function openNecromancerManager(requestedUserId = null) {
 
         <div class="hm-section" data-section="fb">
           <div class="hm-card hm-fb">
-            <div class="hm-head"><h3>Squelettes FlappyBall (${titleLabel})</h3><button type="button" class="btn-toggle-select-all hm-check-btn" data-check-class="sk-check-fb">Cocher FB</button></div>
+            <div class="hm-head"><h3>Squelettes FlappyBall (${titleLabel})</h3><button type="button" class="btn-toggle-select-all hm-check-btn" data-check-class="sk-check-fb">Cocher/Décoher FlappyBall</button></div>
             <table class="hm-table" border="1">
               <colgroup><col class="hm-col-check"><col class="hm-col-name"></colgroup>
               <thead><tr><th>✔</th><th>Nom</th></tr></thead>
@@ -5000,6 +5000,15 @@ export async function openNecromancerManager(requestedUserId = null) {
                                             }
 
                                             if (!results.length) return;
+
+                                            // Sans DD, présenter les jets du plus faible au plus élevé.
+                                            // Le nom stabilise l'ordre lorsque plusieurs totaux sont identiques.
+                                            if (dc == null) {
+                                                results.sort((a, b) =>
+                                                    a.total - b.total
+                                                    || String(a.name).localeCompare(String(b.name), "fr", { sensitivity: "base" })
+                                                );
+                                            }
 
                                             const title = mode === "save" ? "Sauvegarde" : "Test";
                                             const modeLabel = adv && !disadv

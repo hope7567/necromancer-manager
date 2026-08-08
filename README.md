@@ -1,6 +1,6 @@
 # Necromancer Manager
 
-Version 1.0.2 pour Foundry VTT 12 et D&D5e.
+Version 1.0.3 pour Foundry VTT 12 et D&D5e.
 
 - palette native Foundry et adaptation au thème utilisateur ;
 - onglet séparé « Groupes et créatures » ;
